@@ -1,4 +1,4 @@
-cexcept: README 0.6.0 (2000-Apr-07-Fri)
+cexcept: README 0.6.1 (2000-Apr-08-Sat)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 cexcept (pronounced "see except" in English) is a package providing a
@@ -11,11 +11,11 @@ The package consists of the following files:
 
     name        version
     ----------  -------
-    README       0.6.0
+    README       0.6.1
     cexcept.h    0.6.0
     example.c    0.6.0
     example2.c   0.6.0
-    rationale    0.6.0
+    rationale    0.6.1
 
 The package is both free-as-in-speech and free-as-in-beer:
 
@@ -43,6 +43,14 @@ have the very latest version, but probably more highly available:
     http://cexcept.sourceforge.net/
 
 The remainder of this file is a log of changes.
+
+
+2000-Apr-08-Sat
+
+  rationale 0.6.0 --> 0.6.1
+    * Added rationale for disallowing jumping in/out of Try clauses.
+    * Expanded the discussion of finally clauses.
+    * Added rationale for the lack of expressionless Throw.
 
 
 2000-Apr-07-Fri
