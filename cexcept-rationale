@@ -1,0 +1,70 @@
+cexcept-rationale amc.0.5.1 (2000-Mar-31-Fri)
+Adam M. Costello <amc@cs.berkeley.edu>
+
+Rationale behind some of the design decisions of the cexcept.h interface
+(version amc.0.5.*).
+
+
+Why aren't multiple Catch clauses allowed?
+
+    The purpose of multiple catch clauses in C++ or Java is to allow you
+    to catch multiple exception types.  This is natural in a language
+    that supports polymorphism, where you can substitute objects of
+    different types into the same expression and cause different code to
+    be executed.  In such a language you can throw any type of object,
+    and the appropriate catch clause will be selected automatically.
+
+    C does not support polymorphism (except for unions and void
+    pointers).  Therefore it is natural in C to have just one exception
+    type, and therefore one Catch clause is sufficient.  The application
+    programmer is free to use any type for the exception type, and may
+    use a union to simulate polymorphism (see cexcept-example2.c for an
+    example of this).  But for many applications an int, enum, or small
+    struct will be sufficient.
+
+
+But couldn't tricks be played to allow multiple exception types?
+
+    Yes, but cexcept.h is intended for C programs and C programmers.  If
+    the concept of polymorphism were incorporated into the interface,
+    the interface would become less intuitive to many of the people
+    it is designed for.  But if an application programmer uses unions
+    to simulate multiple exception types, the resulting code will be
+    perfectly understandable to other C programmers, even if they have
+    no experience with polymorphism.
+
+
+Why can't I say Catch (int e) like in C++ or Java?
+
+    Again, the interface tries to be intuitive to C programmers.  In C,
+    declarations go at the beginnings of blocks.  The cexcept syntax is
+    actually more flexible in a way, because any lvalue can go in the
+    parentheses, for example: Catch (p->e)
+
+
+Why isn't a Finally clause supported?
+
+    There's no way to implement it.  In C++ or Java, the main difference
+    between putting code in a finally clause versus putting the code
+    after the try/catch statement is that the finally clause will get
+    executed even if a return or throw occurs within the try/catch
+    statement.  In C, a return statement returns immediately.
+
+
+Why are the macros spelled Try, Catch, Throw rather than...?
+
+    We considered many other possibilities:
+
+        try catch throw
+        TRY CATCH THROW
+        ctry ccatch cthrow
+        c_try c_catch c_throw
+        cex_try cex_catch cex_throw
+        CEX_TRY CEX_CATCH CEX_THROW
+        cexcept_try cexcept_catch cexcept_throw
+        try_until_exception catch_exception throw_exception
+
+    We wanted names that would be easy to read, easy to type, intuitive,
+    and unlikely to conflict with existing names.  Ultimately we settled
+    on Try, Catch, and Throw as the best compromise among all these
+    criteria.
