@@ -1,4 +1,4 @@
-cexcept: README 0.6.1 (2000-Apr-08-Sat)
+cexcept: README 0.6.3 (2000-Apr-22-Sat)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 cexcept (pronounced "see except" in English) is a package providing a
@@ -11,8 +11,8 @@ The package consists of the following files:
 
     name        version
     ----------  -------
-    README       0.6.1
-    cexcept.h    0.6.0
+    README       0.6.3
+    cexcept.h    0.6.1
     example.c    0.6.0
     example2.c   0.6.0
     rationale    0.6.1
@@ -43,6 +43,13 @@ have the very latest version, but probably more highly available:
     http://cexcept.sourceforge.net/
 
 The remainder of this file is a log of changes.
+
+
+2000-Apr-22-Sat
+
+  cexcept.h 0.6.0 --> 0.6.1
+    * Clarified that the wrapper .h file is needed only when there are
+      multiple .c files.
 
 
 2000-Apr-08-Sat
