@@ -1,11 +1,12 @@
 /*===
-cexcept-polymorph.c amc.0.2.0 (2000-Mar-05-Sun)
+cexcept-example2.c amc.0.3.0 (2000-Mar-05-Sun)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An example application that demonstrates how to use the cexcept.h
-interface (version amc.0.2.*) to provide polymorphic exceptions.
+interface (version amc.0.3.*) to provide polymorphic exceptions, while
+avoiding the use of global variables.
 
-See also cexcept-example.c.
+See cexcept-example.c for a simpler example.
 
 ===*/
 
@@ -30,15 +31,21 @@ struct exception {
 };
 
 #include "cexcept.h"
-DEFINE_EXCEPTION_TYPE(struct exception);
+define_exception_type(struct exception);
 
 /* End of separate .h file. */
 
 
-void demo_throw(struct exception_context *ec)
+struct thread_state {
+  int blah;
+  struct exception_context ec[1];
+  unsigned long junk;
+};
+
+
+void demo_throw(struct exception_context *exception_context)
 {
   static int count = 0;
-  USE_EXCEPTIONS(ec);
   struct exception e;
 
   fprintf(stderr, "enter demo_throw\n");
@@ -49,48 +56,48 @@ void demo_throw(struct exception_context *ec)
     e.flavor = oops;
     e.msg = "demo oops message";
     e.info.oops = 17;
-    THROW(e);
+    throw(e);
   }
   else if (count == 3) {
     e.flavor = barf;
     e.msg = "demo barf message";
     strcpy(e.info.barf, "ABCDEFG");
-    THROW(e);
+    throw(e);
   }
   else if (count == 4) {
     e.flavor = screwup;
     e.msg = "demo screwup message";
     e.info.screwup = 987654321;
-    THROW(e);
+    throw(e);
   }
 
   fprintf(stderr, "return from demo_throw\n");
 }
 
 
-void foo(struct exception_context *ec)
+void foo(struct thread_state *state)
 {
   fprintf(stderr, "enter foo\n");
-  demo_throw(ec);
+  demo_throw(state->ec);
   fprintf(stderr, "return from foo\n");
 }
 
 
-void bar(struct exception_context *ec)
+void bar(struct thread_state *state)
 {
-  USE_EXCEPTIONS(ec);
+  struct exception_context *exception_context = state->ec;
   struct exception e;
 
   fprintf(stderr, "enter bar\n");
 
-  TRY foo(ec);
-  CATCH(e) {
+  try foo(state);
+  catch(e) {
     switch (e.flavor) {
       case okay: break;
       case oops: fprintf(stderr, "bar caught oops (info == %d): %s\n",
                          e.info.oops, e.msg);
                  break;
-        default: THROW(e);
+        default: throw(e);
     }
   }
 
@@ -100,19 +107,19 @@ void bar(struct exception_context *ec)
 
 int main()
 {
-  struct exception_context ec[1];
-  USE_EXCEPTIONS(ec);
+  struct thread_state state[1];
+  struct exception_context *exception_context = state->ec;
   struct exception e;
 
-  INIT_EXCEPTIONS();
+  init_exceptions();
 
-  TRY {
-    bar(ec);  /* no exceptions */
-    bar(ec);  /* exception will be caught by bar(), looks okay to us */
-    bar(ec);  /* bar() will rethrow the exception */
+  try {
+    bar(state);  /* no exceptions */
+    bar(state);  /* exception will be caught by bar(), looks okay to us */
+    bar(state);  /* bar() will rethrow the exception */
     fprintf(stderr, "we won't get here\n");
   }
-  CATCH(e) {
+  catch(e) {
     switch (e.flavor) {
          case okay: break;
          case barf: fprintf(stderr, "main caught barf (info == %s): %s\n",

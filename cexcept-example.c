@@ -1,17 +1,15 @@
 /*===
-cexcept-example.c amc.0.2.1 (2000-Mar-05-Sun)
+cexcept-example.c amc.0.3.0 (2000-Mar-05-Sun)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An example application that demonstrates how to use the cexcept.h
-interface (version amc.0.2.*).
+interface (version amc.0.3.*).
 
-This application is single-threaded and allocates the struct
-exception_context on the stack in main(), then passes it as an
-argument to functions.  Other options would be to allocate the storage
-dynamically, or to use a global variable (only in single-threaded
-applications), or to include the struct exception_context (or a pointer
-to it) inside some larger thread state structure that gets passed to
-functions.
+This application is single-threaded and uses a global exception context.
+
+See cexcept-example2.c for an example of avoiding global variables by
+passing the context in function arguments, and an example of using a
+polymorphic exception type.
 
 ===*/
 
@@ -23,43 +21,45 @@ functions.
 /* The following declarations would normally go in a separate .h file: */
 
 #include "cexcept.h"
-DEFINE_EXCEPTION_TYPE(int);
+define_exception_type(int);
+extern struct exception_context exception_context[1];
 
 /* End of separate .h file. */
 
 
-void demo_throw(struct exception_context *ec, int fail)
+void demo_throw(int fail)
 {
-  USE_EXCEPTIONS(ec);
-
   fprintf(stderr, "enter demo_throw(%d)\n", fail);
-  if (fail) THROW(42);
+  if (fail) throw(42);
   fprintf(stderr, "return from demo_throw(%d)\n", fail);
 }
 
 
-void foo(struct exception_context *ec, int fail)
+void foo(int fail)
 {
   fprintf(stderr, "enter foo(%d)\n", fail);
-  demo_throw(ec,fail);
+  demo_throw(fail);
   fprintf(stderr, "return from foo(%d)\n", fail);
 }
 
 
+/* Globally accessible storage for the exception context: */
+
+struct exception_context exception_context[1];
+
+
 int main()
 {
-  struct exception_context ec[1];
-  USE_EXCEPTIONS(ec);
   int e;
 
-  INIT_EXCEPTIONS();
+  init_exceptions();
 
-  TRY {
-    foo(ec,0);
-    foo(ec,1);
-    foo(ec,2);
+  try {
+    foo(0);
+    foo(1);
+    foo(2);
   }
-  CATCH(e) fprintf(stderr, "exception %d\n", e);
+  catch(e) fprintf(stderr, "exception %d\n", e);
 
   return EXIT_SUCCESS;
 }
