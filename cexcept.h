@@ -1,5 +1,5 @@
 /*===
-cexcept.h 2.0.0-pre2 (2001-Apr-25-Wed)
+cexcept.h 2.0.0 (2001-Jul-12-Thu)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An interface for exception-handling in ANSI C (C89 and subsequent ISO
@@ -12,6 +12,9 @@ standards), developed jointly with Cosmin Truta <cosmin@cs.toronto.edu>.
     and terms of use of the derived file.  The copyright holders make
     no guarantees regarding this file, and are not responsible for any
     damage resulting from its use.
+
+Only user-defined exceptions are supported, not "real" exceptions like
+division by zero or memory segmentation violations.
 
 If this interface is used by multiple .c files, they shouldn't include
 this header file directly.  Instead, create a wrapper header file that
@@ -36,6 +39,10 @@ define_exception_type(type_name);
 
         struct exception { int code; const char *msg; };
         define_exception_type(struct exception);
+
+    Because throwing an exception causes the object to be copied (not
+    just once, but twice), programmers may wish to consider size when
+    choosing the exception type.
 
 
 struct exception_context;

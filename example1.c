@@ -1,5 +1,5 @@
 /*===
-cexcept: example.c 2.0.0-pre1 (2001-Mar-21-Wed)
+cexcept: example1.c 2.0.0 (2001-Jul-12-Thu)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An example application that demonstrates how to use version 2.0.* of the
