@@ -1,11 +1,12 @@
 /*===
-cexcept.h amc.0.3.0 (2000-Mar-05-Sun)
+cexcept.h amc.0.4.0 (2000-Mar-07-Tue)
 Adam M. Costello <amc@cs.berkeley.edu>
 
-An interface for exception-handling in ANSI C.
+An interface for exception-handling in ANSI C, based on the ideas of
+Cosmin Truta <cosmin@cs.toronto.edu>.
 
 You don't normally want .c files to include this header file directly.
-Instead, create your own header file that includes this header file and
+Instead, create a wrapper header file that includes this header file and
 then invokes the define_exception_type macro (see below), and let your
 .c files include that header file.
 
@@ -54,36 +55,45 @@ struct exception_context *exception_context;
     object separate from the structure object.
 
 
-void init_exceptions(void);
+void init_exception_context(void);
 
     This macro is used like a function.  It must be called once after
-    the struct exception_context is allocated, before the first try is
-    encountered.
+    the struct exception_context is allocated, before the first
+    ctry/ccatch statement is encountered.
 
 
-try statement
-catch(e) statement
+ctry statement
+ccatch(e) statement
 
-    These macros provide a new statement syntax.  As with if/else,
-    each statement may be a simple statement ending with a semicolon
-    or a brace-enclosed compound statement.  Unlike else, the catch
-    is required.  The type of e must match the type passed to
+    These macros are not called "try" and "catch" by default, in
+    order to avoid confusion with the C++ keywords, which have subtly
+    different semantics.  However, applications may wish to include
+    definitions like the following in their wrapper header files:
+
+        #define try   ctry
+        #define catch ccatch
+        #define throw cthrow
+
+    The ctry/ccatch macros provide a new statement syntax.  As with
+    if/else, each statement may be a simple statement ending with a
+    semicolon or a brace-enclosed compound statement.  Unlike else,
+    ccatch is required.  The type of e must match the type passed to
     define_exception_type().
 
-    If a throw() that uses the same exception context as the try/catch
-    is executed within the try statement (typically within a function
-    called by the statement), a copy of the exception will be assigned
-    to e, and control will jump to the catch statement.  If no such
-    throw() is executed, e is not modified, and the catch statement is
-    not executed.
+    If a cthrow() that uses the same exception context as the
+    ctry/ccatch is executed within the ctry statement (typically within
+    a function called by the statement), a copy of the exception will
+    be assigned to e, and control will jump to the ccatch statement.
+    If no such cthrow() is executed, e is not modified, and the ccatch
+    statement is not executed.
 
-    IMPORTANT: return and goto must not be used to jump out of a try
-    statement--the catch must be reached.  Also, the values of any
-    non-volatile automatic variables changed within the try statement
+    IMPORTANT: return and goto must not be used to jump out of a ctry
+    statement--the ccatch must be reached.  Also, the values of any
+    non-volatile automatic variables changed within the ctry statement
     are undefined after an exception is caught.
 
 
-void throw(e);
+void cthrow(e);
 
     This macro is used like a function that does not return.  The type
     of e must match the type passed to define_exception_type().  The
@@ -114,9 +124,9 @@ struct exception__jmp_buf {
   jmp_buf env;
 };
 
-#define init_exceptions() ((void)(exception_context->last = 0))
+#define init_exception_context() ((void)(exception_context->last = 0))
 
-#define try \
+#define ctry \
   { \
     struct exception__jmp_buf *exception__p, exception__j; \
     exception__p = exception_context->last; \
@@ -124,7 +134,7 @@ struct exception__jmp_buf {
     if (setjmp(exception__j.env) == 0) { \
       if (1)
 
-#define catch(e) \
+#define ccatch(e) \
       else { } \
       exception_context->caught = 0; \
     } \
@@ -134,9 +144,14 @@ struct exception__jmp_buf {
     } \
     exception_context->last = exception__p; \
   } \
-  if (exception_context->caught)
+  if (!exception_context->caught) { } \
+  else
 
-#define throw(e) \
+/* ctry ends with if(), and ccatch begins and ends with else.  */
+/* This ensures that the ctry/ccatch syntax is really the same */
+/* as the if/else syntax.                                      */
+
+#define cthrow(e) \
   (exception_context->tmp = (e), longjmp(exception_context->last->env, 1))
 
 

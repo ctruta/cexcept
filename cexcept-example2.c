@@ -1,9 +1,9 @@
 /*===
-cexcept-example2.c amc.0.3.0 (2000-Mar-05-Sun)
+cexcept-example2.c amc.0.4.0 (2000-Mar-07-Tue)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An example application that demonstrates how to use the cexcept.h
-interface (version amc.0.3.*) to provide polymorphic exceptions, while
+interface (version amc.0.4.*) to provide polymorphic exceptions, while
 avoiding the use of global variables.
 
 See cexcept-example.c for a simpler example.
@@ -32,6 +32,9 @@ struct exception {
 
 #include "cexcept.h"
 define_exception_type(struct exception);
+#define try   ctry
+#define catch ccatch
+#define throw cthrow
 
 /* End of separate .h file. */
 
@@ -111,7 +114,7 @@ int main()
   struct exception_context *exception_context = state->ec;
   struct exception e;
 
-  init_exceptions();
+  init_exception_context();
 
   try {
     bar(state);  /* no exceptions */

@@ -1,9 +1,9 @@
 /*===
-cexcept-example.c amc.0.3.0 (2000-Mar-05-Sun)
+cexcept-example.c amc.0.4.0 (2000-Mar-07-Tue)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An example application that demonstrates how to use the cexcept.h
-interface (version amc.0.3.*).
+interface (version amc.0.4.*).
 
 This application is single-threaded and uses a global exception context.
 
@@ -22,6 +22,9 @@ polymorphic exception type.
 
 #include "cexcept.h"
 define_exception_type(int);
+#define try   ctry
+#define catch ccatch
+#define throw cthrow
 extern struct exception_context exception_context[1];
 
 /* End of separate .h file. */
@@ -52,7 +55,7 @@ int main()
 {
   int e;
 
-  init_exceptions();
+  init_exception_context();
 
   try {
     foo(0);
