@@ -1,5 +1,5 @@
 /*===
-cexcept.h 2.0.0-pre1 (2001-Mar-21-Wed)
+cexcept.h 2.0.0-pre2 (2001-Apr-25-Wed)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An interface for exception-handling in ANSI C (C89 and subsequent ISO
@@ -209,15 +209,15 @@ struct exception_context { \
       the_exception_context->caught = 0; \
     } \
     else { \
-      the_exception_context->caught = 1 action \
+      the_exception_context->caught = 1; \
     } \
     the_exception_context->penv = exception__prev; \
   } \
-  if (!the_exception_context->caught) { } \
+  if (!the_exception_context->caught || action) { } \
   else
 
-#define Catch(e) exception__catch(; (e) = the_exception_context->v.etmp;)
-#define Catch_anonymous exception__catch(;)
+#define Catch(e) exception__catch(((e) = the_exception_context->v.etmp, 0))
+#define Catch_anonymous exception__catch(0)
 
 /* Try ends with if(), and Catch begins and ends with else.  This     */
 /* ensures that the Try/Catch syntax is really the same as the        */
