@@ -1,9 +1,14 @@
 /*===
-cexcept.h amc.0.5.0 (2000-Mar-19-Sun)
+cexcept.h amc.0.5.1 (2000-Mar-29-Wed)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An interface for exception-handling in ANSI C, based on the ideas of
 Cosmin Truta <cosmin@cs.toronto.edu>.
+
+This file is public domain, but we would be thankful if people exercise
+common courtesy and avoid confusing or misleading people about the
+authorship or version of this file or derivatives of it.  We make no
+guarantees about its correctness, and we are not responible for its use.
 
 You don't normally want .c files to include this header file directly.
 Instead, create a wrapper header file that includes this header file and
@@ -134,6 +139,12 @@ struct exception__jmp_buf {
   jmp_buf env;
 };
 
+/* The purpose of this wrapper struct around jmp_buf is to guard     */
+/* against compilers that fail to consider *&x to be equivalent to x */
+/* (not x[1]) when x is an array, because jmp_buf is an array type.  */
+/* In ANSI C this is no problem, but it's a subtle point, so we'll   */
+/* just be paranoid and use the wrapper struct.                      */
+
 #define init_exception_context() ((void)(the_exception_context->last = 0))
 
 #define Try \
@@ -142,7 +153,12 @@ struct exception__jmp_buf {
     exception__p = the_exception_context->last; \
     the_exception_context->last = &exception__j; \
     if (setjmp(exception__j.env) == 0) { \
-      if (1)
+      if (&exception__j)
+
+/* We use &exception__j rather than 1 to appease compilers that       */
+/* warn about constant expressions inside the if().  Most compilers   */
+/* should still recognize that &exception__j is always true and avoid */
+/* generating test code.                                              */
 
 #define Catch(e) \
       else { } \
