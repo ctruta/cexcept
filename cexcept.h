@@ -1,5 +1,5 @@
 /*===
-cexcept.h amc.0.5.2 (2000-Mar-30-Thu)
+cexcept.h amc.0.5.3 (2000-Apr-01-Sat)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An interface for exception-handling in ANSI C, based on the ideas of
@@ -24,24 +24,25 @@ macros.
 
 define_exception_type(type_name);
 
-    This macro is used like an external declaration.  It specifies the
-    type of object that gets copied from the exception thrower to the
-    exception catcher.  The type_name must refer to a complete type (as
-    opposed to an incomplete struct/union/array type).
+    This macro is used like an external declaration.  It specifies
+    the type of object that gets copied from the exception thrower to
+    the exception catcher.  The type_name can be any type that can be
+    copied, that is, anything except a function, array, incomplete
+    struct/union, or void.
 
 
 struct exception_context;
 
-    This type is declared by the define_exception_type() macro.  A
-    struct exception_context must be known to both the thrower and the
-    catcher.  It is expected that there be one struct exception_context
-    for each thread that uses exceptions.  It would certainly be
-    dangerous for multiple threads to access the same context, and
-    would probably not be useful for one thread to use multiple
-    contexts.  The application can allocate this structure in any way it
-    pleases--automatic, static, or dynamic.  The application programmer
-    should pretend not to know the structure members, which are subject
-    to change.
+    This type may be used after the define_exception_type() macro has
+    been invoked.  A struct exception_context must be known to both the
+    thrower and the catcher.  It is expected that there be one struct
+    exception_context for each thread that uses exceptions.  It would
+    certainly be dangerous for multiple threads to access the same
+    context, and would probably not be useful for one thread to use
+    multiple contexts.  The application can allocate this structure in
+    any way it pleases--automatic, static, or dynamic.  The application
+    programmer should pretend not to know the structure members, which
+    are subject to change.
 
 
 struct exception_context *the_exception_context;
@@ -64,8 +65,13 @@ struct exception_context *the_exception_context;
 
     The name could even be a macro, for example:
 
-    struct exception_context *get_ec(void);
-    #define the_exception_context get_ec()
+    struct exception_context ec_array[numthreads];
+    #define the_exception_context (ec_array + thread_id)
+
+    Be aware that the the_exception_context is referred to a number of
+    times by the Try/Catch/Throw macros, so it shouldn't be expensive or
+    have side effects.  The expansion must be a drop-in replacement for
+    an identifier, so it's safest to put parentheses around it.
 
 
 void init_exception_context(void);
@@ -95,14 +101,16 @@ Catch (expression) statement
     executed within the Try clause (typically within a function called
     by the Try clause), and the exception is not caught by a nested
     Try/Catch statement, then a copy of the exception will be assigned
-    to the expression, and control will jump to the Catch clause.  If no
-    such Throw is executed, expr is not modified, and the Catch clause
-    is not executed.
+    to the expression, and control will jump to the Catch clause.  If
+    no such Throw is executed, then the Catch clause is not executed,
+    the assignment is not performed, and the expression is not even
+    evaluated (which is significant if it has side effects).
 
-    IMPORTANT: return and goto must not be used to jump out of a
-    Try clause--the Catch must be reached.  Also, the values of any
-    non-volatile automatic variables changed within the Try clause are
-    undefined after an exception is caught.
+    IMPORTANT: return, goto, continue, and break statements must not be
+    used to jump out of a Try clause--the Catch keyword must be reached
+    (but jumping out of the Catch clause is okay).  Also, the values of
+    any non-volatile automatic variables changed within the Try clause
+    are undefined after an exception is caught.
 
 
 Throw expression;
@@ -135,7 +143,7 @@ is subject to change.
 struct exception_context { \
   struct exception__jmp_buf *last; \
   int caught; \
-  etype tmp; \
+  etype exception; \
 }
 
 struct exception__jmp_buf {
@@ -167,13 +175,11 @@ struct exception__jmp_buf {
       else { } \
       the_exception_context->caught = 0; \
     } \
-    else { \
-      (e) = the_exception_context->tmp; \
-      the_exception_context->caught = 1; \
-    } \
+    else the_exception_context->caught = 1; \
     the_exception_context->last = exception__p; \
   } \
-  if (!the_exception_context->caught) { } \
+  if (!the_exception_context->caught || \
+      ((e) = the_exception_context->exception, 0)) { } \
   else
 
 /* Try ends with if(), and Catch begins and ends with else.  */
@@ -182,7 +188,7 @@ struct exception__jmp_buf {
 
 #define Throw \
   for (;; longjmp(the_exception_context->last->env, 1)) \
-    the_exception_context->tmp =
+    the_exception_context->exception =
 
 
 #endif /* CEXCEPT_H */
