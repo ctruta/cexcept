@@ -1,4 +1,4 @@
-cexcept: rationale 0.6.0 (2000-Apr-07-Fri)
+cexcept: rationale 0.6.1 (2000-Apr-08-Sat)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 Rationale for some of the design decisions behind version 0.6.* of the
@@ -42,13 +42,72 @@ Why can't I say Catch (int e) like in C++ or Java?
     parentheses, for example: Catch (p->e)
 
 
+Why can't I jump into or out of a Try clause?
+
+    There is some hidden setup and cleanup that needs to be done
+    regardless of whether an exception is caught.  Jumping into a Try
+    clause would avoid doing the setup, and jumping out of it would
+    avoid doing the cleanup.
+
+
 Why isn't a Finally clause supported?
 
-    There's no way to implement it.  In C++ or Java, the main difference
+    There's no way to implement it.  In Java, the main difference
     between putting code in a finally clause versus putting the code
     after the try/catch statement is that the finally clause will get
-    executed even if a return or throw occurs within the try/catch
-    statement.  In C, a return statement returns immediately.
+    executed even if a return or throw occurs within the try clause or
+    catch clause.  But in C, a return statement returns immediately.
+
+    In Java one could make do without a finally clause by deferring
+    any return from the try clause (by storing the return value in a
+    variable), and moving some or all of the catch code outside the
+    try/catch statement, like so:
+
+        Exception e = null;
+
+        try { ... }
+        catch (Exception tmp) { e = tmp; }
+
+        // Do cleanup here.
+
+        if (e instanceof Foo) { ... }
+        else if (e instanceof Bar) { ... }
+        ...
+        else if (e != null) throw e;
+
+    A similar technique can be used with cexcept:
+
+        my_exception_type e = some null value that will not be thrown;
+
+        Try { ... }
+        Catch (e) { }
+
+        /* Do cleanup here. */
+
+        if (e is not that null value) { ... }
+
+
+Why can't I use Throw without an expression to re-throw an exception?
+
+    The use of throw without an expression is needed in C++ because it's
+    the only way to re-throw an exception of unknown type:
+
+        catch (...) {
+          // do some stuff
+          throw;
+        }
+
+    This syntax is not provided in Java because the fact that all
+    exceptions are instances of Exception eliminates the problem:
+
+        catch (Exception e) {
+          // do some stuff
+          throw e;
+        }
+
+    Similarly, with cexcept, the type of exceptions is always known, so
+    an expressionless Throw is not needed.  Besides, the syntax would be
+    very difficult, if not impossible, to implement.
 
 
 Why is the Catch expression evaluated even if no exception is caught?
