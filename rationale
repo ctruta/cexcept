@@ -1,7 +1,7 @@
-cexcept: rationale 0.6.1 (2000-Apr-08-Sat)
+cexcept: rationale 1.0.0 (2000-Jun-21-Wed)
 Adam M. Costello <amc@cs.berkeley.edu>
 
-Rationale for some of the design decisions behind version 0.6.* of the
+Rationale for some of the design decisions behind version 1.0.* of the
 cexcept.h interface.  See README for copyright information.
 
 
