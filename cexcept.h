@@ -1,14 +1,17 @@
 /*===
-cexcept.h amc.0.5.1 (2000-Mar-29-Wed)
+cexcept.h amc.0.5.2 (2000-Mar-30-Thu)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An interface for exception-handling in ANSI C, based on the ideas of
 Cosmin Truta <cosmin@cs.toronto.edu>.
 
-This file is public domain, but we would be thankful if people exercise
-common courtesy and avoid confusing or misleading people about the
-authorship or version of this file or derivatives of it.  We make no
-guarantees about its correctness, and we are not responible for its use.
+    Copyright (c) 2000 Adam M. Costello and Cosmin Truta.  Everyone is
+    hereby granted permission to do whatever they like with this file,
+    provided that if they modify it they take reasonable steps to avoid
+    confusing or misleading people about the authors and version of the
+    derived file.  The copyright holders make no guarantees about the
+    correctness of this file, and are not responsible for any damage
+    resulting from its use.
 
 You don't normally want .c files to include this header file directly.
 Instead, create a wrapper header file that includes this header file and
