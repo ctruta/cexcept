@@ -1,8 +1,8 @@
 /*===
-cexcept: example.c 1.0.0 (2000-Jun-21-Wed)
+cexcept: example.c 2.0.0-pre1 (2001-Mar-21-Wed)
 Adam M. Costello <amc@cs.berkeley.edu>
 
-An example application that demonstrates how to use version 1.0.* of the
+An example application that demonstrates how to use version 2.0.* of the
 cexcept.h interface.  See README for copyright information.
 
 This application is single-threaded and uses a global exception context.

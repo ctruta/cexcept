@@ -1,7 +1,7 @@
-cexcept: rationale 1.0.0 (2000-Jun-21-Wed)
+cexcept: rationale 2.0.0-pre1 (2001-Mar-21-Wed)
 Adam M. Costello <amc@cs.berkeley.edu>
 
-Rationale for some of the design decisions behind version 1.0.* of the
+Rationale for some of the design decisions behind version 2.0.* of the
 cexcept.h interface.  See README for copyright information.
 
 
@@ -18,9 +18,9 @@ Why aren't multiple Catch clauses allowed?
     pointers).  Therefore it is natural in C to have just one exception
     type, and therefore one Catch clause is sufficient.  The application
     programmer is free to use any type for the exception type, and may
-    use a union to simulate polymorphism (see cexcept-example2.c for an
-    example of this).  But for many applications an int, enum, or small
-    struct will be sufficient.
+    use a union to simulate polymorphism (see example2.c for an example
+    of this).  But for many applications an int, enum, or small struct
+    will be sufficient.
 
 
 But couldn't tricks be played to allow multiple exception types?
@@ -110,27 +110,27 @@ Why can't I use Throw without an expression to re-throw an exception?
     very difficult, if not impossible, to implement.
 
 
-Why is the Catch expression evaluated even if no exception is caught?
+Why must the Catch expression have the same type that was passed to
+define_exception_type()?  I can assign a double value to an int, so why
+can't I catch a double exception in an int variable?
 
-    We need to warn potential throwers where to store the exception
-    value in the event of an exception.  In order to avoid evaluating
-    the expression, we would have to let the thrower store the value in
-    a temporary location, which would then have to be copied into the
-    user-supplied object.
+    The intuitive expectation is that "Throw v" and "Catch (e)" should
+    have an effect equivalent to "e = v".  The latter converts v to the
+    type of e, but the Throw statement has no way of knowing the type of
+    e, so it converts v to the type passed to define_exception_type().
+    Depending on how cexcept is implemented, unintuitive or even
+    undefined behavior could result if e has a different type.
 
 
-Why must the Catch expression have the exact same type that was passed
-to define_exception_type()?  I can assign a double value to an int, so
-why can't I catch a double exception in an int variable?
+Why does the implementation copy the exception twice?
 
-    The type of the object passed to Catch cannot be communicated to the
-    thrower, so the thrower must assume it is storing into an object of
-    the type passed to define_exception_type().  If we had the thrower
-    store into a temporary variable, and the catcher perform a second
-    copy, then the requirement could be relaxed, but the semantics
-    would still not be the same as a direct assignment of the Throw
-    expression into the Catch expression, because two conversions might
-    be performed.
+    The Throw statement must store the exception value somewhere.  If it
+    stores directly into the object named by the Catch expression, then
+    that object must not be a non-volatile automatic object.  It was
+    deemed preferable to copy the exception twice rather than prohibit
+    application programmers from catching exceptions in non-volatile
+    automatic objects (which is what they would most often be inclined
+    to use).
 
 
 Why are the macros spelled Try, Catch, Throw rather than...?

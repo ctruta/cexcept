@@ -1,8 +1,8 @@
 /*===
-cexcept: example2.c 1.0.0 (2000-Jun-21-Wed)
+cexcept: example2.c 2.0.0-pre1 (2001-Mar-21-Wed)
 Adam M. Costello <amc@cs.berkeley.edu>
 
-An example application that demonstrates how to use version 1.0.* of the
+An example application that demonstrates how to use version 2.0.* of the
 cexcept.h interface to provide polymorphic exceptions, while avoiding
 the use of global variables.  It also illustrates the use of dynamically
 nested Try blocks.

@@ -1,21 +1,22 @@
-cexcept: README 1.0.0 (2000-Jun-21-Wed)
+cexcept: README 2.0.0-pre1 (2001-Mar-21-Wed)
 Adam M. Costello <amc@cs.berkeley.edu>
 
-cexcept (pronounced "see except" in English) is a package providing a
-Try/Catch/Throw exception handling interface for ANSI C (and subsequent
-ISO C standards).  It does not attempt to handle "real" exceptions like
-floating-point exceptions or addressing exceptions; it is intended as an
-enhanced user-friendly alternative to setjmp() & longjmp().
+cexcept (pronounced "see except" in English) is a package providing
+a Try/Catch/Throw exception handling interface for ANSI C (C89 and
+subsequent ISO standards).  It does not attempt to handle "real"
+exceptions like floating-point exceptions or addressing exceptions; it
+is intended as an enhanced user-friendly alternative to setjmp() and
+longjmp().
 
 The package consists of the following files:
 
     name        version
     ----------  -------
-    README       1.0.0
-    cexcept.h    1.0.0
-    example.c    1.0.0
-    example2.c   1.0.0
-    rationale    1.0.0
+    README       2.0.0
+    cexcept.h    2.0.0
+    example.c    2.0.0
+    example2.c   2.0.0
+    rationale    2.0.0
 
 The package is both free-as-in-speech and free-as-in-beer:
 
@@ -24,8 +25,8 @@ The package is both free-as-in-speech and free-as-in-beer:
     provided that if they modify them they take reasonable steps to
     avoid confusing or misleading people about the authors, versions,
     and terms of use of the derived files.  The copyright holders make
-    no guarantees about the correctness of these files, and are not
-    responsible for any damage resulting from their use.
+    no guarantees regarding these files, and are not responsible for any
+    damage resulting from their use.
 
 The version number of this README file can be considered the version
 number of the whole package.
@@ -43,6 +44,46 @@ have the very latest version, but probably more highly available:
     http://cexcept.sourceforge.net/
 
 The remainder of this file is a log of changes.
+
+
+2001-Mar-21-Wed
+
+  cexcept.h 1.0.0 --> 2.0.0
+    * The documentation had neglected to mention that the Catch
+      expression was evaluated before the Try clause was executed.
+      Rather than document this unintuitive behavior, we have changed
+      the interface so that the Catch expression is not evaluated unless
+      and until an exception is caught.  This change will not affect
+      applications that never used Catch expressions with side effects.
+    * The implementation had been technically incorrect because it
+      modified the object named by the Catch expression between the
+      setjmp and longjmp calls, even though it might be a non-volatile
+      automatic object (which it was in example.c).  The problem (which
+      affected no known compilers) has been corrected by performing two
+      copies: first into volatile temporary storage before the longjmp,
+      then into the Catch expression after the longjmp.
+    * The requirement that the Catch expression have the "exact same
+      type" that was passed to define_exception_type() has been slightly
+      relaxed to disregard type qualifiers.
+    * In the license, "no guarantees about the correctness of this file"
+      has been changed to "no guarantees regarding this file".
+
+  rationale 1.0.0 --> 2.0.0
+    * Removed the obsolete question about why the Catch expression is
+      always evaluated.
+    * Updated the answer to the question about the type of the Catch
+      expression, to correspond to the new implementation.
+    * Added a question about why two copies are necessary.
+
+  example.c 1.0.0 --> 2.0.0
+  example2.c 1.0.0 --> 2.0.0
+    * Changed the version number to agree with cexcept.h in the first
+      two places (2.0.*).
+
+  README 1.0.0 --> 2.0.0
+    * Reworded the license to agree with cexcept.h.
+    * Changed the version number to agree with cexcept.h in the first
+      two places (2.0.*).
 
 
 2000-Jun-21-Wed
