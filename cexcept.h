@@ -1,5 +1,5 @@
 /*===
-cexcept.h 0.6.0 (2000-Apr-07-Fri)
+cexcept.h 0.6.1 (2000-Apr-22-Sat)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An interface for exception-handling in ANSI C, developed jointly with
@@ -13,10 +13,10 @@ Cosmin Truta <cosmin@cs.toronto.edu>.
     no guarantees about the correctness of this file, and are not
     responsible for any damage resulting from its use.
 
-You don't normally want .c files to include this header file directly.
-Instead, create a wrapper header file that includes this header file and
-then invokes the define_exception_type macro (see below), and let your
-.c files include that header file.
+If this interface is used by multiple .c files, they shouldn't include
+this header file directly.  Instead, create a wrapper header file that
+includes this header file and then invokes the define_exception_type
+macro (see below), and let your .c files include that header file.
 
 The interface consists of one type, one well-known name, and six macros.
 
