@@ -1,9 +1,9 @@
-#if 0
-cexcept-example.c amc.0.1.1 (2000-Mar-03-Fri)
+/*===
+cexcept-example.c amc.0.2.1 (2000-Mar-05-Sun)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An example application that demonstrates how to use the cexcept.h
-interface (version amc.0.1.*).
+interface (version amc.0.2.*).
 
 This application is single-threaded and allocates the struct
 exception_context on the stack in main(), then passes it as an
@@ -13,28 +13,27 @@ applications), or to include the struct exception_context (or a pointer
 to it) inside some larger thread state structure that gets passed to
 functions.
 
-#endif
+===*/
 
 
 #include <stdio.h>
 #include <stdlib.h>
 
+
+/* The following declarations would normally go in a separate .h file: */
+
 #include "cexcept.h"
+DEFINE_EXCEPTION_TYPE(int);
+
+/* End of separate .h file. */
 
 
 void demo_throw(struct exception_context *ec, int fail)
 {
   USE_EXCEPTIONS(ec);
-  struct exception e;
 
   fprintf(stderr, "enter demo_throw(%d)\n", fail);
-
-  if (fail) {
-    e.code = 42;
-    e.msg = "demo message";
-    THROW(e);
-  }
-
+  if (fail) THROW(42);
   fprintf(stderr, "return from demo_throw(%d)\n", fail);
 }
 
@@ -47,25 +46,20 @@ void foo(struct exception_context *ec, int fail)
 }
 
 
-main()
+int main()
 {
   struct exception_context ec[1];
-
-  /* That's a cute way to allocate space and create a convenient */
-  /* name for its address, all in one step.  It can also be done */
-  /* inside structures.                                          */
-
   USE_EXCEPTIONS(ec);
-  struct exception e;
+  int e;
 
   INIT_EXCEPTIONS();
 
-  BEGIN_CATCH
+  TRY {
     foo(ec,0);
     foo(ec,1);
     foo(ec,2);
-  END_CATCH(e)
+  }
+  CATCH(e) fprintf(stderr, "exception %d\n", e);
 
-  if (e.code) fprintf(stderr, "exception %d: %s\n", e.code, e.msg);
   return EXIT_SUCCESS;
 }

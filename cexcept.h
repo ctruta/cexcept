@@ -1,92 +1,85 @@
-#if 0
-cexcept.h amc.0.1.1 (2000-Mar-04-Sat)
+/*===
+cexcept.h amc.0.2.1 (2000-Mar-05-Sun)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An interface for exception-handling in ANSI C.
 
-#endif
+You don't normally want .c files to include this header file directly.
+Instead, create your own header file that includes this header file and
+then invokes the DEFINE_EXCEPTION_TYPE macro (see below), and let your
+.c files include that header file.
 
-
-#ifndef CEXCEPT_H
-#define CEXCEPT_H
-
-
-#ifndef CEXCEPT_CUSTOM_EXCEPTION
-struct exception {
-  int code;
-  const char *msg;
-  void *who;
-  void *what;
-};
-#endif
-
-    /* A struct exception is what gets copied from the exception */
-    /* thrower to the exception catcher.  Applications are       */
-    /* welcome to change this declaration, either by editing     */
-    /* this file or by declaring struct exception and defining   */
-    /* CEXCEPT_CUSTOM_EXCEPTION before including this file.      */
-    /* There must be a member called "code", which must have an  */
-    /* integral type or a pointer type.                          */
-
+The interface consists of one type and five macros.
 
 struct exception_context;
 
-    /* A struct exception_context must be known to both the thrower   */
-    /* and the catcher.  It is expected that there be one struct      */
-    /* exception_context for each thread that uses exceptions.  It    */
-    /* would certainly be dangerous for multiple threads to access    */
-    /* the same context, and would probably not be useful for one     */
-    /* thread to use multiple contexts.  The structure members will   */
-    /* be declared below, so that the application can allocate this   */
-    /* structure (in any way it pleases--automatic, static, or        */
-    /* dynamic), but the application programmer should pretend not to */
-    /* know the members, which are subject to change.                 */
+    A struct exception_context must be known to both the thrower and the
+    catcher.  It is expected that there be one struct exception_context
+    for each thread that uses exceptions.  It would certainly be
+    dangerous for multiple threads to access the same context, and
+    would probably not be useful for one thread to use multiple
+    contexts.  The application can allocate this structure (in any way
+    it pleases--automatic, static, or dynamic), but the application
+    programmer should pretend not to know the members, which are
+    subject to change.  A convenient way to define the storage is as a
+    one-element array:
+
+    struct exception_context foo[1];
+
+    This way, foo is a pointer to the structure, which is what you need
+    to pass to USE_EXCEPTIONS().
 
 
-#if 0
+DEFINE_EXCEPTION_TYPE(type_name);
 
-The rest of the interface consists of four macros:
+    This macro is used like an external declaration.  It specifies the
+    type of object that gets copied from the exception thrower to the
+    exception catcher.  The type_name must refer to a complete type (as
+    opposed to an incomplete struct/union/array type).
 
 
-USE_EXCEPTIONS(struct exception_context *ec)
+USE_EXCEPTIONS(struct exception_context *ec);
 
     This macro is used like an internal declaration (it may appear only
-    in the declaration sections of blocks).  The other macros
-    may appear only within the scope of such a declaration.
-    Typically, this declaration would go near the top of each function
-    that either throws or catches exceptions, but it may appear in
-    nested blocks instead (or in addition to).
+    in the declaration sections of blocks).  The macros described below
+    may appear only within the scope of such a declaration.  Typically,
+    this declaration would go near the top of each function that either
+    throws or catches exceptions, but it may appear in nested blocks
+    instead (or in addition to).
 
 
-void INIT_EXCEPTIONS(void)
+void INIT_EXCEPTIONS(void);
 
-    This macro is used like a function.  It must be called once
-    after the struct exception_context is allocated, before the first
-    BEGIN_CATCH is encountered.
-
-
-BEGIN_CATCH
-END_CATCH(struct exception e)
-
-    These macros are used like braces--they begin and end a block,
-    called a "catch block", which may begin with declarations just like
-    a regular block.  Unlike the other macros, these two should not
-    be followed by semicolons.  Any exception thrown within the block
-    (usually by a function called from within the block) causes control
-    to jump to the end of the block, and e will contain a copy of the
-    exception.  If no exception is thrown, e.code will be 0.  IMPORTANT:
-    return and goto must not be used to jump out of a catch block--the
-    END_CATCH must be reached.  And the values of any non-volatile
-    automatic variables changed within the catch block are undefined if
-    an exception is caught.
+    This macro is used like a function.  It must be called once after
+    the struct exception_context is allocated, before the first TRY is
+    encountered.
 
 
-void THROW(struct exception e)
+TRY statement
+CATCH(e) statement
 
-    This macro is used like a function that does not return.  The
-    thrower must assign a non-zero value to e.code if it wants to make
-    sure that the catcher knows that an exception occurred.  Of course,
-    the thrower may also assign values to the other members of e.  The
+    These macros provide a new statement syntax.  As with if/else,
+    each statement may be a simple statement ending with a semicolon
+    or a brace-enclosed compound statement.  Unlike else, the CATCH
+    is required.  The type of e must match the type passed to
+    DEFINE_EXCEPTION_TYPE().
+
+    If an exception is thrown within the TRY statement (typically
+    by a function called from within the statement), a copy of the
+    exception will be assigned to e, and control will jump to the CATCH
+    statement.  If no exception is thrown, e is not modified, and the
+    CATCH statement is not executed.
+
+    IMPORTANT: return and goto must not be used to jump out of a TRY
+    statement--the CATCH must be reached.  Also, the values of any
+    non-volatile automatic variables changed within the TRY statement
+    are undefined after an exception is caught.
+
+
+void THROW(e);
+
+    This macro is used like a function that does not return.  The type
+    of e must match the type passed to DEFINE_EXCEPTION_TYPE().  The
     exception must be caught, otherwise the program may crash.
 
 
@@ -94,17 +87,23 @@ Everything below this point is for the benefit of the compiler.  The
 application programmer should pretend not to know any of it, because it
 is subject to change.
 
-#endif
+===*/
+
+
+#ifndef CEXCEPT_H
+#define CEXCEPT_H
 
 
 #include <setjmp.h>
 
-struct exception_context {
-  struct exception_jmp_buf *last;
-  struct exception tmp;
-};
+#define DEFINE_EXCEPTION_TYPE(etype) \
+struct exception_context { \
+  struct exception__jmp_buf *last; \
+  int caught; \
+  etype tmp; \
+}
 
-struct exception_jmp_buf {
+struct exception__jmp_buf {
   jmp_buf env;
 };
 
@@ -112,15 +111,25 @@ struct exception_jmp_buf {
 
 #define INIT_EXCEPTIONS() ((void)(exception__c->last = 0))
 
-#define  BEGIN_CATCH { \
-  struct exception_jmp_buf *exception__p = exception__c->last, exception__j; \
-  exception__c->last = &exception__j; \
-  if (setjmp(exception__j.env) == 0) {
+#define TRY \
+  { \
+    struct exception__jmp_buf *exception__p, exception__j; \
+    exception__p = exception__c->last; \
+    exception__c->last = &exception__j; \
+    if (setjmp(exception__j.env) == 0) { \
+      if (1)
 
-#define END_CATCH(e) \
-    (e).code = 0; \
-  } else (e) = exception__c->tmp; \
-  exception__c->last = exception__p; }
+#define CATCH(e) \
+      else { } \
+      exception__c->caught = 0; \
+    } \
+    else { \
+      (e) = exception__c->tmp; \
+      exception__c->caught = 1; \
+    } \
+    exception__c->last = exception__p; \
+  } \
+  if (exception__c->caught)
 
 #define THROW(e) (exception__c->tmp = (e), longjmp(exception__c->last->env, 1))
 

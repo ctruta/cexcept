@@ -1,25 +1,26 @@
-#if 0
-cexcept-polymorph.c amc.0.1.1 (2000-Mar-04-Sat)
+/*===
+cexcept-polymorph.c amc.0.2.0 (2000-Mar-05-Sun)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An example application that demonstrates how to use the cexcept.h
-interface (version amc.0.1.*) to provide polymorphic exceptions.
+interface (version amc.0.2.*) to provide polymorphic exceptions.
 
 See also cexcept-example.c.
 
-#endif
+===*/
 
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define CEXCEPT_CUSTOM_EXCEPTION
+
+/* The following declarations would normally go in a separate .h file: */
 
 enum exception_flavor { okay, oops, screwup, barf };
 
 struct exception {
-  enum exception_flavor code;
+  enum exception_flavor flavor;
   const char *msg;
   union {
     int oops;
@@ -29,6 +30,9 @@ struct exception {
 };
 
 #include "cexcept.h"
+DEFINE_EXCEPTION_TYPE(struct exception);
+
+/* End of separate .h file. */
 
 
 void demo_throw(struct exception_context *ec)
@@ -42,19 +46,19 @@ void demo_throw(struct exception_context *ec)
   ++count;
 
   if (count == 2) {
-    e.code = oops;
+    e.flavor = oops;
     e.msg = "demo oops message";
     e.info.oops = 17;
     THROW(e);
   }
   else if (count == 3) {
-    e.code = barf;
+    e.flavor = barf;
     e.msg = "demo barf message";
     strcpy(e.info.barf, "ABCDEFG");
     THROW(e);
   }
   else if (count == 4) {
-    e.code = screwup;
+    e.flavor = screwup;
     e.msg = "demo screwup message";
     e.info.screwup = 987654321;
     THROW(e);
@@ -79,50 +83,45 @@ void bar(struct exception_context *ec)
 
   fprintf(stderr, "enter bar\n");
 
-  BEGIN_CATCH
-    foo(ec);
-  END_CATCH(e)
-
-  switch (e.code) {
-    case okay: break;
-    case oops: fprintf(stderr, "bar caught oops (info == %d): %s\n",
-                       e.info.oops, e.msg);
-               break;
-      default: THROW(e);
+  TRY foo(ec);
+  CATCH(e) {
+    switch (e.flavor) {
+      case okay: break;
+      case oops: fprintf(stderr, "bar caught oops (info == %d): %s\n",
+                         e.info.oops, e.msg);
+                 break;
+        default: THROW(e);
+    }
   }
 
   fprintf(stderr, "return from bar\n");
 }
 
 
-main()
+int main()
 {
   struct exception_context ec[1];
-
-  /* That's a cute way to allocate space and create a convenient */
-  /* name for its address, all in one step.  It can also be done */
-  /* inside structures.                                          */
-
   USE_EXCEPTIONS(ec);
   struct exception e;
 
   INIT_EXCEPTIONS();
 
-  BEGIN_CATCH
+  TRY {
     bar(ec);  /* no exceptions */
     bar(ec);  /* exception will be caught by bar(), looks okay to us */
     bar(ec);  /* bar() will rethrow the exception */
     fprintf(stderr, "we won't get here\n");
-  END_CATCH(e)
-
-  switch (e.code) {
-       case okay: break;
-       case barf: fprintf(stderr, "main caught barf (info == %s): %s\n",
-                          e.info.barf, e.msg);
-                  break;
-    case screwup: fprintf(stderr, "main caught screwup (info == %ld): %s\n",
-                          e.info.screwup, e.msg);
-         default: fprintf(stderr, "main caught unknown exception\n");
+  }
+  CATCH(e) {
+    switch (e.flavor) {
+         case okay: break;
+         case barf: fprintf(stderr, "main caught barf (info == %s): %s\n",
+                            e.info.barf, e.msg);
+                    break;
+      case screwup: fprintf(stderr, "main caught screwup (info == %ld): %s\n",
+                            e.info.screwup, e.msg);
+           default: fprintf(stderr, "main caught unknown exception\n");
+    }
   }
 
   return EXIT_SUCCESS;
