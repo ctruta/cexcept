@@ -1,12 +1,15 @@
 /*===
-cexcept-example2.c amc.0.5.0 (2000-Mar-19-Sun)
+cexcept: example2.c 0.6.0 (2000-Apr-07-Fri)
 Adam M. Costello <amc@cs.berkeley.edu>
 
-An example application that demonstrates how to use the cexcept.h
-interface (version amc.0.5.*) to provide polymorphic exceptions, while
-avoiding the use of global variables.
+An example application that demonstrates how to use version 0.6.* of the
+cexcept.h interface to provide polymorphic exceptions, while avoiding
+the use of global variables.  It also illustrates the use of dynamically
+nested Try blocks.
 
-See cexcept-example.c for a simpler example.
+See README for copyright information.
+
+See example.c for a simpler example.
 
 ===*/
 
@@ -112,7 +115,7 @@ int main()
   struct exception_context *the_exception_context = state->ec;
   struct exception e;
 
-  init_exception_context();
+  init_exception_context(the_exception_context);
 
   Try {
     bar(state);  /* no exceptions */

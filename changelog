@@ -1,9 +1,0 @@
-2000-Apr-01-Fri
-  cexcept.h amc.0.5.2 --> amc.0.5.3
-    * Eliminated a compiler warning about an uninitialized variable.
-    * Improved the documentation of allowable exception types.
-    * Added advice about using a macro for the_exception_context, and
-      changed the example accordingly.
-    * Improved the documentation regarding jumping out of Try and Catch.
-
-Earlier changes were not logged.

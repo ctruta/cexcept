@@ -1,8 +1,8 @@
-cexcept-rationale amc.0.5.1 (2000-Mar-31-Fri)
+cexcept: rationale 0.6.0 (2000-Apr-07-Fri)
 Adam M. Costello <amc@cs.berkeley.edu>
 
-Rationale behind some of the design decisions of the cexcept.h interface
-(version amc.0.5.*).
+Rationale for some of the design decisions behind version 0.6.* of the
+cexcept.h interface.  See README for copyright information.
 
 
 Why aren't multiple Catch clauses allowed?
@@ -49,6 +49,29 @@ Why isn't a Finally clause supported?
     after the try/catch statement is that the finally clause will get
     executed even if a return or throw occurs within the try/catch
     statement.  In C, a return statement returns immediately.
+
+
+Why is the Catch expression evaluated even if no exception is caught?
+
+    We need to warn potential throwers where to store the exception
+    value in the event of an exception.  In order to avoid evaluating
+    the expression, we would have to let the thrower store the value in
+    a temporary location, which would then have to be copied into the
+    user-supplied object.
+
+
+Why must the Catch expression have the exact same type that was passed
+to define_exception_type()?  I can assign a double value to an int, so
+why can't I catch a double exception in an int variable?
+
+    The type of the object passed to Catch cannot be communicated to the
+    thrower, so the thrower must assume it is storing into an object of
+    the type passed to define_exception_type().  If we had the thrower
+    store into a temporary variable, and the catcher perform a second
+    copy, then the requirement could be relaxed, but the semantics
+    would still not be the same as a direct assignment of the Throw
+    expression into the Catch expression, because two conversions might
+    be performed.
 
 
 Why are the macros spelled Try, Catch, Throw rather than...?

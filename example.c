@@ -1,15 +1,15 @@
 /*===
-cexcept-example.c amc.0.5.0 (2000-Mar-19-Sun)
+cexcept: example.c 0.6.0 (2000-Apr-07-Fri)
 Adam M. Costello <amc@cs.berkeley.edu>
 
-An example application that demonstrates how to use the cexcept.h
-interface (version amc.0.5.*).
+An example application that demonstrates how to use version 0.6.* of the
+cexcept.h interface.  See README for copyright information.
 
 This application is single-threaded and uses a global exception context.
 
-See cexcept-example2.c for an example of avoiding global variables by
-passing the context in function arguments, and an example of using a
-polymorphic exception type.
+See example2.c for a demonstration of nested Try blocks, avoidance of
+global variables by passing the context in function arguments, and the
+use of a polymorphic exception type.
 
 ===*/
 
@@ -52,14 +52,15 @@ int main()
 {
   int e;
 
-  init_exception_context();
-
   Try {
     foo(0);
     foo(1);
     foo(2);
   }
   Catch (e) fprintf(stderr, "exception %d\n", e);
+
+  Try foo(3);
+  Catch_anonymous fprintf(stderr, "anonymous exception\n");
 
   return EXIT_SUCCESS;
 }
