@@ -1,6 +1,9 @@
 /*===
-cexcept.h 2.0.1 (2008-Jul-19-Sat)
+cexcept.h 2.0.1-optipng (2011-Jul-22)
+Derived from cexcept.h 2.0.1 by Cosmin Truta
+
 http://www.nicemice.net/cexcept/
+
 Adam M. Costello
 http://www.nicemice.net/amc/
 
@@ -210,7 +213,8 @@ struct exception_context { \
 
 #define Try \
   { \
-    jmp_buf *exception__prev, exception__env; \
+    jmp_buf * volatile exception__prev; \
+    jmp_buf exception__env; \
     exception__prev = the_exception_context->penv; \
     the_exception_context->penv = &exception__env; \
     if (setjmp(exception__env) == 0) { \
