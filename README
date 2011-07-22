@@ -1,5 +1,8 @@
-cexcept: README 2.0.1 (2008-Jul-23-Wed)
+cexcept: README 2.0.1-optipng (2011-Jul-22)
+Updated by Cosmin Truta
+
 http://www.nicemice.net/cexcept/
+
 Adam M. Costello
 http://www.nicemice.net/amc/
 
@@ -14,8 +17,8 @@ The package consists of the following files:
 
     name        version
     ----------  -------
-    README       2.0.1
-    cexcept.h    2.0.1
+    README       2.0.1-optipng
+    cexcept.h    2.0.1-optipng
     example1.c   2.0.0
     example2.c   2.0.0
     rationale    2.0.0
@@ -48,6 +51,12 @@ have the very latest version, but probably more highly available:
 
 The remainder of this file is a log of changes.
 
+
+2011-Jul-22-Fri
+
+  cexcept.h 2.0.1 --> 2.0.1-optipng
+    * Made exception__prev volatile to avoid "variable might be clobbered
+      by longjmp" warnings when a function contains multiple Try blocks.
 
 2008-Jul-23-Wed
 
