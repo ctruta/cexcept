@@ -1,6 +1,6 @@
 /*===
-cexcept.h 2.0.1-optipng (2011-Jul-22)
-Derived from cexcept.h 2.0.1 by Cosmin Truta
+cexcept.h 2.0.2-optipng (2022-Nov-20)
+Updated by Cosmin Truta
 
 http://www.nicemice.net/cexcept/
 
@@ -10,7 +10,7 @@ http://www.nicemice.net/amc/
 An interface for exception-handling in ANSI C (C89 and subsequent ISO
 standards), developed jointly with Cosmin Truta.
 
-    Copyright (c) 2000-2008 Adam M. Costello and Cosmin Truta.
+    Copyright (c) 2000-2022 Adam M. Costello and Cosmin Truta.
     This software may be modified only if its author and version
     information is updated accurately, and may be redistributed
     only if accompanied by this unaltered notice.  Subject to those
@@ -213,9 +213,9 @@ struct exception_context { \
 
 #define Try \
   { \
-    jmp_buf * volatile exception__prev; \
+    jmp_buf *exception__prev[1]; \
     jmp_buf exception__env; \
-    exception__prev = the_exception_context->penv; \
+    exception__prev[0] = the_exception_context->penv; \
     the_exception_context->penv = &exception__env; \
     if (setjmp(exception__env) == 0) { \
       do
@@ -227,7 +227,7 @@ struct exception_context { \
     else { \
       the_exception_context->caught = 1; \
     } \
-    the_exception_context->penv = exception__prev; \
+    the_exception_context->penv = exception__prev[0]; \
   } \
   if (!the_exception_context->caught || action) { } \
   else

@@ -1,4 +1,4 @@
-cexcept: README 2.0.1-optipng (2011-Jul-22)
+cexcept: README 2.0.2-optipng (2022-Nov-20)
 Updated by Cosmin Truta
 
 http://www.nicemice.net/cexcept/
@@ -17,15 +17,15 @@ The package consists of the following files:
 
     name        version
     ----------  -------
-    README       2.0.1-optipng
-    cexcept.h    2.0.1-optipng
+    README       2.0.2-optipng
+    cexcept.h    2.0.2-optipng
     example1.c   2.0.0
     example2.c   2.0.0
     rationale    2.0.0
 
 The package is both free-as-in-speech and free-as-in-beer:
 
-    Copyright (c) 2000-2008 Adam M. Costello and Cosmin Truta.
+    Copyright (c) 2000-2022 Adam M. Costello and Cosmin Truta.
     This package may be modified only if its author and version
     information is updated accurately, and may be redistributed
     only if accompanied by this unaltered notice.  Subject to those
@@ -52,11 +52,20 @@ have the very latest version, but probably more highly available:
 The remainder of this file is a log of changes.
 
 
+2022-Nov-20-Sun
+
+  cexcept.h 2.0.1-optipng --> 2.0.2-optipng
+    * Improved the workaround against aggressive optimizing compilers
+      that might clobber the exception__prev pointer. Instead of making
+      this pointer volatile, we are boxing it inside a one-element array.
+
+
 2011-Jul-22-Fri
 
   cexcept.h 2.0.1 --> 2.0.1-optipng
     * Made exception__prev volatile to avoid "variable might be clobbered
       by longjmp" warnings when a function contains multiple Try blocks.
+
 
 2008-Jul-23-Wed
 
@@ -70,6 +79,7 @@ The remainder of this file is a log of changes.
   README 2.0.0 --> 2.0.1
     * Reworded the license to agree with cexcept.h.
     * Updated the URLs.
+
 
 2001-Jul-12-Thu
 
