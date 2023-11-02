@@ -1,6 +1,9 @@
 /*===
-cexcept: example2.c 2.0.0 (2001-Mar-21-Wed)
-Adam M. Costello <amc@cs.berkeley.edu>
+cexcept: example2.c
+
+Last updated:
+ * Cosmin Truta (2023-Nov-02-Thu)
+ * Adam M. Costello (2001-Mar-21-Wed)
 
 An example application that demonstrates how to use version 2.0.* of the
 cexcept.h interface to provide polymorphic exceptions, while avoiding
@@ -105,6 +108,13 @@ void bar(struct thread_state *state)
     }
   }
 
+  Try {
+    /* nothing to try here */
+  }
+  Catch_anonymous {
+    /* nothing to catch here */
+  }
+
   fprintf(stderr, "return from bar\n");
 }
 
@@ -131,6 +141,7 @@ int main()
                     break;
       case screwup: fprintf(stderr, "main caught screwup (info == %ld): %s\n",
                             e.info.screwup, e.msg);
+                    /* FALLTHROUGH */
            default: fprintf(stderr, "main caught unknown exception\n");
     }
   }
