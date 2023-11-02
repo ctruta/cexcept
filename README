@@ -1,4 +1,4 @@
-cexcept: README 2.0.2-optipng (2022-Nov-20)
+cexcept: README 2.0.3-optipng (2023-Nov-02)
 Updated by Cosmin Truta
 
 http://www.nicemice.net/cexcept/
@@ -17,15 +17,15 @@ The package consists of the following files:
 
     name        version
     ----------  -------
-    README       2.0.2-optipng
+    README       2.0.3-optipng
     cexcept.h    2.0.2-optipng
     example1.c   2.0.0
-    example2.c   2.0.0
+    example2.c   2.0.0+
     rationale    2.0.0
 
 The package is both free-as-in-speech and free-as-in-beer:
 
-    Copyright (c) 2000-2022 Adam M. Costello and Cosmin Truta.
+    Copyright (c) 2000-2023 Adam M. Costello and Cosmin Truta.
     This package may be modified only if its author and version
     information is updated accurately, and may be redistributed
     only if accompanied by this unaltered notice.  Subject to those
@@ -50,6 +50,13 @@ have the very latest version, but probably more highly available:
     http://cexcept.sourceforge.net/
 
 The remainder of this file is a log of changes.
+
+
+2023-Nov-02-Thu
+
+  example2.c 2.0.0 --> 2.0.0+
+    * Added a test for empty Try and Catch blocks.
+    * Added BSD-style FALLTHROUGH and NOTREACHED comments where applicable.
 
 
 2022-Nov-20-Sun
