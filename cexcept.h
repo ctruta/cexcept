@@ -1,20 +1,46 @@
 /*===
-cexcept.h 2.0.1 (2008-Jul-19-Sat)
+cexcept.h version 2.99-optipng
+https://sourceforge.net/projects/cexcept/
 http://www.nicemice.net/cexcept/
+
+
+## Author
+
 Adam M. Costello
 http://www.nicemice.net/amc/
 
-An interface for exception-handling in ANSI C (C89 and subsequent ISO
+
+## Summary
+
+An interface for exception handling in ANSI C (C89 and subsequent ISO
 standards), developed jointly with Cosmin Truta.
 
-    Copyright (c) 2000-2008 Adam M. Costello and Cosmin Truta.
-    This software may be modified only if its author and version
-    information is updated accurately, and may be redistributed
-    only if accompanied by this unaltered notice.  Subject to those
-    restrictions, permission is granted to anyone to do anything
-    with this software.  The copyright holders make no guarantees
-    regarding this software, and are not responsible for any damage
-    resulting from its use.
+
+## Copyright Notice, Disclaimer and License
+
+ * Copyright (c) 2000-2025 Cosmin Truta.
+ * Copyright (c) 2000-2008 Adam M. Costello.
+
+This software is provided 'as-is', without any express or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+ 1. The origin of this software must not be misrepresented; you must not
+    claim that you wrote the original software.  If you use this software
+    in a product, an acknowledgment in the product documentation would be
+    appreciated but is not required.
+
+ 2. Altered source versions must be plainly marked as such, and must not
+    be misrepresented as being the original software.
+
+ 3. This notice may not be removed or altered from any source distribution.
+
+
+## API Notes
 
 The cexcept interface is not compatible with and cannot interact
 with system exceptions (like division by zero or memory segmentation
@@ -210,8 +236,9 @@ struct exception_context { \
 
 #define Try \
   { \
-    jmp_buf *exception__prev, exception__env; \
-    exception__prev = the_exception_context->penv; \
+    jmp_buf *exception__prev[1]; \
+    jmp_buf exception__env; \
+    exception__prev[0] = the_exception_context->penv; \
     the_exception_context->penv = &exception__env; \
     if (setjmp(exception__env) == 0) { \
       do
@@ -223,7 +250,7 @@ struct exception_context { \
     else { \
       the_exception_context->caught = 1; \
     } \
-    the_exception_context->penv = exception__prev; \
+    the_exception_context->penv = exception__prev[0]; \
   } \
   if (!the_exception_context->caught || action) { } \
   else
