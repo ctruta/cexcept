@@ -1,18 +1,15 @@
 /*===
 cexcept: example2.c
 
-Last updated:
- * Cosmin Truta (2023-Nov-02-Thu)
- * Adam M. Costello (2001-Mar-21-Wed)
-
-An example application that demonstrates how to use version 2.0.* of the
-cexcept.h interface to provide polymorphic exceptions, while avoiding
-the use of global variables.  It also illustrates the use of dynamically
-nested Try blocks.
-
-See README for copyright information.
+An example program that demonstrates how to use the cexcept interface to
+provide polymorphic exceptions while avoiding the use of global variables.
+This program also illustrates the use of dynamically-nested Try blocks.
 
 See example1.c for a simpler example.
+
+Use, modification and distribution are subject to the zlib license.
+See the accompanying LICENSE.md file for copyright information, or visit
+https://opensource.org/license/zlib
 
 ===*/
 
